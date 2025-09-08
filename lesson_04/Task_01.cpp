@@ -16,20 +16,19 @@ void DataBase::dropTable()
 
 void DataBase::createTable()
 {
-    try
-    {
         pqxx::work txn(connection_);
+        pqxx::result r = 
         txn.exec(R"(CREATE TABLE IF NOT EXISTS person (id SERIAL PRIMARY KEY, name VARCHAR(50), surname VARCHAR(50), email VARCHAR(100));
                   CREATE TABLE IF NOT EXISTS phone (id SERIAL PRIMARY KEY, phone_number VARCHAR(20), person_id INTEGER REFERENCES person(id));)");
         txn.commit();
-        std::cout << "Table created successfully!" << std::endl;
-    }
-    catch (const std::exception& e)
-    {
-        SetConsoleCP(CP_UTF8);
-        SetConsoleOutputCP(CP_UTF8);
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
+        if (r.empty())
+        {
+            std::cout << "Table created successfully!" << std::endl;
+        }
+        else
+        {
+            throw std::string{"Failed to create table!" };
+        }
 }
 
 void DataBase::addClient(const std::string& name, const std::string& surname, const std::string& email, const std::string& phone)
@@ -38,19 +37,19 @@ void DataBase::addClient(const std::string& name, const std::string& surname, co
     pqxx::result r = txn.exec_params(
     "INSERT INTO person (name, surname, email) VALUES ($1, $2, $3)"
     "RETURNING id ", name, surname, email);
-if (!r.empty())
-{
+    if (!r.empty())
+    {
     int person_id = r[0][0].as<int>();
     txn.exec_params(
         "INSERT INTO phone (phone_number, person_id) VALUES ($1, $2)", phone, person_id);
     txn.commit();
     std::cout << "Client added with id: " << person_id << std::endl;
-}
-else
-{
+    }
+    else
+    {
     txn.abort();
-    std::cerr << "Failed to add client!" << std::endl;
-}
+    throw std::string{ "Failed to add client!" };
+    }
 }
  
 
@@ -71,7 +70,7 @@ void DataBase::addPhone(const std::string& name, const std::string& phone)
     else
     {
         txn.abort();
-        std::cerr << "Client not found:" << name << std::endl;
+        throw std::string{"Client not found:" + name};
     }
 }
 
@@ -93,7 +92,7 @@ void DataBase::changeClient(const std::string& email, const std::string& newName
     else
     {
         txn.abort();
-        std::cerr << "Client not found:" << email << std::endl;
+        throw std::string{"Client not found:" + email};
     }
 }
 
@@ -115,7 +114,7 @@ if (!r.empty())
 else
 {
     txn.abort();
-    std::cerr << "Client not found:" << email << std::endl;
+    throw std::string{"Client not found:" + email};
 }
 }
 
@@ -140,7 +139,7 @@ void DataBase::deleteClient(const std::string& email)
     else
     {
         txn.abort();
-        std::cerr << "Client not found:" << email << std::endl;
+        throw std::string{"Client not found:" + email};
     }
 }
 

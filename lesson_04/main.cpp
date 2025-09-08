@@ -16,27 +16,56 @@ int main()
         DataBase db(connectString);
         
         db.dropTable();
-        db.createTable();
         
-        db.addClient("Ivan", "Ivanov", "ivanov@mail.ru", "89999999999");
-        db.showTable();
+        try
+        {
+            db.createTable();
+            db.showTable();
+        }
+        catch (std::string error_masage)
+        {
+            std::cout << error_masage << std::endl;
+        }
 
-        db.addClient("Petr", "Petrov", "petrov@mail.ru", "88888888888");
-        db.showTable();
+        try
+        {
+            db.addClient("Ivan", "Ivanov", "ivanov@mail.ru", "89999999999");
+            db.showTable();
+        }
+        catch (std::string error_masage)
+        {
+            std::cout << error_masage << std::endl;
+        }
+
+        try
+        {
+            db.addClient("Petr", "Petrov", "petrov@mail.ru", "88888888888");
+            db.showTable();
+        }
+        catch (std::string error_masage)
+        {
+        std::cout << error_masage << std::endl;
+        }
+        
 
         try
         {
             db.addPhone("Ivan", "87777777777");
             db.showTable();
+        }
+        catch (std::string error_masage)
+        {
+            std::cout << error_masage << std::endl;
+        }
 
+        try
+        {
             db.addPhone("Petr", "86666666666");
             db.showTable();
         }
-        catch (const std::exception& e)
+        catch (std::string error_masage)
         {
-            SetConsoleCP(CP_UTF8);
-            SetConsoleOutputCP(CP_UTF8);
-            std::cout << "Error: " << e.what() << std::endl;
+            std::cout << error_masage << std::endl;
         }
 
         try
@@ -44,18 +73,30 @@ int main()
             db.changeClient("ivanov@mail.ru", "Ivann", "Ivanovv", "ivanovv@mail.ru");
             db.showTable();
         }
-        catch (const std::exception& e)
+        catch (std::string error_masage)
         {
-            SetConsoleCP(CP_UTF8);
-            SetConsoleOutputCP(CP_UTF8);
-            std::cout << "Error: " << e.what() << std::endl;
+            std::cout << error_masage << std::endl;
         }
 
-        db.deletePhone("ivanovv@mail.ru", "89999999999");
-        db.showTable();
+        try
+        {
+            db.deletePhone("ivanovv@mail.ru", "89999999999");
+            db.showTable();
+        }
+        catch (std::string error_masage)
+        {
+            std::cout << error_masage << std::endl;
+        }
 
-        db.deleteClient("ivanovv@mail.ru");
-        db.showTable();
+        try
+        {
+            db.deleteClient("ivanovv@mail.ru");
+            db.showTable();
+        }
+        catch (std::string error_masage)
+        {
+            std::cout << error_masage << std::endl;
+        }
 
         std::vector<Client> clients = db.findClient("Petr");
         for (const auto& client : clients)
@@ -67,7 +108,7 @@ int main()
     {
         SetConsoleCP(CP_UTF8);
         SetConsoleOutputCP(CP_UTF8);
-        std::cerr << "Error connect: " << e.what() << std::endl;
+        std::cout << "Error connect: " << e.what() << std::endl;
     }
 
     return 0;
